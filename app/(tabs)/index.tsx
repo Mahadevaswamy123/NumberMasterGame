@@ -1,98 +1,96 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Number Master</Text>
+        </View>
+        
+        <Text style={styles.subtitle}>Match numbers that equal or sum to 10!</Text>
+        
+        <View style={styles.features}>
+          <Text style={styles.feature}>🎯 3 Challenging Levels</Text>
+          <Text style={styles.feature}>⏱️ 2-minute Timer</Text>
+          <Text style={styles.feature}>🎮 Fun Gameplay</Text>
+        </View>
+      </View>
+
+      <View style={styles.playButtonContainer}>
+        <TouchableOpacity 
+          style={styles.playButton} 
+          onPress={() => router.push('/game')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.playButtonText}>🚀 START GAME</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#667eea',
+    paddingHorizontal: 20,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#E8E8E8',
+    textAlign: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 20,
+  },
+  features: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  feature: {
+    fontSize: 14,
+    color: '#D1D1D1',
     marginBottom: 8,
+    textAlign: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  playButtonContainer: {
+    paddingBottom: 50,
+    alignItems: 'center',
+  },
+  playButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    shadowColor: '#FF6B6B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  playButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
