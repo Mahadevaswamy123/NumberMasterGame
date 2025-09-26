@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   SafeAreaView,
   StatusBar,
   Animated,
@@ -22,10 +21,12 @@ import Tile from './Tile';
 import Timer from './Timer';
 import LevelCompleteModal from './LevelCompleteModal';
 import GameOverModal from './GameOverModal';
+import PauseModal from './PauseModal';
 
 const GameScreen = ({ navigation }) => {
   const { gameState, actions } = useGame();
   const [animationTrigger, setAnimationTrigger] = useState(null);
+  const [showPauseModal, setShowPauseModal] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -135,15 +136,18 @@ const GameScreen = ({ navigation }) => {
   const handlePause = () => {
     if (gameStatus === 'playing') {
       actions.pauseGame();
-      Alert.alert(
-        'Game Paused',
-        'Game is paused. Tap Resume to continue.',
-        [
-          { text: 'Resume', onPress: () => actions.resumeGame() },
-          { text: 'Quit', onPress: () => navigation.navigate('LevelSelector') },
-        ]
-      );
+      setShowPauseModal(true);
     }
+  };
+
+  const handleResume = () => {
+    setShowPauseModal(false);
+    actions.resumeGame();
+  };
+
+  const handleQuit = () => {
+    setShowPauseModal(false);
+    navigation.navigate('LevelSelector');
   };
 
   const renderGrid = () => {
@@ -310,21 +314,12 @@ const GameScreen = ({ navigation }) => {
         onBackToMenu={() => navigation.navigate('LevelSelector')}
       />
 
-      {/* Pause Overlay */}
-      {gameStatus === 'paused' && (
-        <View style={styles.pauseOverlay}>
-          <View style={styles.pauseModal}>
-            <Text style={styles.pauseTitle}>⏸️ Game Paused</Text>
-            <Text style={styles.pauseSubtitle}>Tap the play button to resume</Text>
-            <TouchableOpacity 
-              style={styles.resumeButton} 
-              onPress={() => actions.resumeGame()}
-            >
-              <Text style={styles.resumeButtonText}>▶️ Resume Game</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      {/* Pause Modal */}
+      <PauseModal
+        visible={showPauseModal}
+        onResume={handleResume}
+        onQuit={handleQuit}
+      />
     </SafeAreaView>
   );
 };
@@ -473,56 +468,6 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: 'rgba(255,255,255,0.6)',
-  },
-  pauseOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  pauseModal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    padding: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 20,
-  },
-  pauseTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#667eea',
-    marginBottom: 10,
-  },
-  pauseSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 25,
-  },
-  resumeButton: {
-    backgroundColor: '#4ECDC4',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    shadowColor: '#4ECDC4',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  resumeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
 
