@@ -12,9 +12,6 @@ import {
   Platform,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
-const isSmallScreen = width < 350;
-const isTinyScreen = width < 320;
 import { useGame } from '../../contexts/GameContext';
 import { LEVEL_CONFIG } from '../../utils/gameEngine';
 import Tile from './Tile';
@@ -22,6 +19,10 @@ import Timer from './Timer';
 import LevelCompleteModal from './LevelCompleteModal';
 import GameOverModal from './GameOverModal';
 import PauseModal from './PauseModal';
+
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = width < 350;
+const isTinyScreen = width < 320;
 
 const GameScreen = ({ navigation }) => {
   const { gameState, actions } = useGame();
@@ -45,6 +46,17 @@ const GameScreen = ({ navigation }) => {
     ]).start();
   }, []);
 
+  // Safety check for gameState
+  if (!gameState) {
+    return null; // or a loading component
+  }
+
+  // If game is in menu state, redirect to level selector
+  if (gameState.gameStatus === 'menu') {
+    navigation.navigate('LevelSelector');
+    return null;
+  }
+
   const {
     level,
     grid,
@@ -56,7 +68,7 @@ const GameScreen = ({ navigation }) => {
   } = gameState;
 
   const levelConfig = LEVEL_CONFIG[level];
-  const canAddRow = addRowsUsed < levelConfig.addRowsAllowed;
+  const canAddRow = addRowsUsed < (levelConfig?.addRowsAllowed || 0);
 
   // Handle match animations
   useEffect(() => {
@@ -151,6 +163,10 @@ const GameScreen = ({ navigation }) => {
   };
 
   const renderGrid = () => {
+    if (!grid || !Array.isArray(grid)) {
+      return null;
+    }
+    
     return grid.map((row, rowIndex) => (
       <View key={rowIndex} style={styles.row}>
         {row.map((tile) => (

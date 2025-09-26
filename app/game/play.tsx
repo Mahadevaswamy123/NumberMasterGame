@@ -8,6 +8,8 @@ export default function GamePlay() {
     navigate: (screen: string) => {
       if (screen === 'LevelSelector') {
         router.push('/game');
+      } else if (screen === 'Game') {
+        router.push('/game/play');
       }
     }
   };

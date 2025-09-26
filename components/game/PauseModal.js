@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: 12,
   },
   button: {
     paddingVertical: isSmallScreen ? 12 : 16,
@@ -201,6 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7fafc',
     borderWidth: 1,
     borderColor: '#e2e8f0',
+    marginTop: 12,
   },
   quitButtonText: {
     color: '#4a5568',
