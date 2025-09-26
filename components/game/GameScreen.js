@@ -94,50 +94,6 @@ const GameScreen = ({ navigation }) => {
     }
   }, [lastMatchAnimation]);
 
-  // Handle game completion
-  useEffect(() => {
-    if (gameStatus === 'completed') {
-      setTimeout(() => {
-        Alert.alert(
-          'Level Complete!',
-          `Congratulations! You completed Level ${level}\n\nScore: ${score}\nMatches: ${matches}`,
-          [
-            {
-              text: level < 3 ? 'Next Level' : 'Play Again',
-              onPress: () => {
-                if (level < 3) {
-                  actions.nextLevel();
-                } else {
-                  actions.resetGame(1);
-                }
-              },
-            },
-            {
-              text: 'Menu',
-              onPress: () => navigation.navigate('LevelSelector'),
-            },
-          ]
-        );
-      }, 500);
-    } else if (gameStatus === 'failed') {
-      setTimeout(() => {
-        Alert.alert(
-          'Time\'s Up!',
-          `Better luck next time!\n\nScore: ${score}\nMatches: ${matches}`,
-          [
-            {
-              text: 'Try Again',
-              onPress: () => actions.resetGame(level),
-            },
-            {
-              text: 'Menu',
-              onPress: () => navigation.navigate('LevelSelector'),
-            },
-          ]
-        );
-      }, 500);
-    }
-  }, [gameStatus]);
 
   const handleAddRow = () => {
     if (canAddRow) {
