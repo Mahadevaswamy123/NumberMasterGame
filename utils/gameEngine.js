@@ -1,48 +1,26 @@
 // Game Engine for Number Master Game
 // Handles grid generation, match checking, and level configuration
+// ✅ Uses reusable Level System framework
 
-export const LEVEL_CONFIG = {
-  1: {
-    rows: 3,
-    cols: 4,
-    addRowsAllowed: 2,
-    timeLimit: 120, // 2 minutes in seconds
-    difficulty: 'easy',
-    targetMatches: 8,
-  },
-  2: {
-    rows: 3,
-    cols: 4,
-    addRowsAllowed: 1,
-    timeLimit: 120,
-    difficulty: 'medium',
-    targetMatches: 10,
-  },
-  3: {
-    rows: 3,
-    cols: 4,
-    addRowsAllowed: 1,
-    timeLimit: 120,
-    difficulty: 'hard',
-    targetMatches: 12,
-  },
+import { createNumberMasterLevelManager, LEVEL_CONFIG as LEVELS } from '../core/LevelSystem';
+
+// Create level manager instance (Singleton pattern)
+let levelManagerInstance = null;
+
+export const getLevelManager = () => {
+  if (!levelManagerInstance) {
+    levelManagerInstance = createNumberMasterLevelManager();
+  }
+  return levelManagerInstance;
 };
 
-// Generate random numbers based on difficulty
-const generateNumber = (difficulty) => {
-  switch (difficulty) {
-    case 'easy':
-      // More pairs and sum-to-10 combinations
-      return Math.floor(Math.random() * 9) + 1; // 1-9
-    case 'medium':
-      // Mix of easy and harder numbers
-      return Math.floor(Math.random() * 12) + 1; // 1-12
-    case 'hard':
-      // Harder combinations
-      return Math.floor(Math.random() * 15) + 1; // 1-15
-    default:
-      return Math.floor(Math.random() * 9) + 1;
-  }
+// Export level config for backward compatibility
+export const LEVEL_CONFIG = LEVELS;
+
+// Generate random numbers based on number range
+const generateNumber = (numberRange) => {
+  const { min, max } = numberRange || { min: 1, max: 9 };
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 // Generate initial grid with strategic number placement
@@ -56,7 +34,7 @@ export const generateGrid = (level) => {
     for (let col = 0; col < config.cols; col++) {
       rowData.push({
         id: `${row}-${col}`,
-        value: generateNumber(config.difficulty),
+        value: generateNumber(config.numberRange),
         matched: false,
         row,
         col,
@@ -65,8 +43,9 @@ export const generateGrid = (level) => {
     grid.push(rowData);
   }
   
-  // Ensure some guaranteed matches based on difficulty
-  const guaranteedMatches = Math.floor(config.targetMatches * 0.6);
+  // Ensure some guaranteed matches based on configuration
+  const totalCells = config.rows * config.cols;
+  const guaranteedMatches = Math.floor((totalCells / 2) * (config.guaranteedMatchRate || 0.6));
   
   for (let i = 0; i < guaranteedMatches; i++) {
     const row = Math.floor(Math.random() * config.rows);
@@ -81,15 +60,17 @@ export const generateGrid = (level) => {
     // Create either equal numbers or sum-to-10 pairs
     if (Math.random() < 0.5) {
       // Equal numbers
-      const value = generateNumber(config.difficulty);
+      const value = generateNumber(config.numberRange);
       grid[row][col1].value = value;
       grid[row][col2].value = value;
     } else {
       // Sum to 10
-      const value1 = Math.floor(Math.random() * 9) + 1; // 1-9
+      const value1 = Math.min(Math.floor(Math.random() * 9) + 1, config.numberRange.max);
       const value2 = 10 - value1;
-      grid[row][col1].value = value1;
-      grid[row][col2].value = value2;
+      if (value2 >= config.numberRange.min && value2 <= config.numberRange.max) {
+        grid[row][col1].value = value1;
+        grid[row][col2].value = value2;
+      }
     }
   }
   
@@ -105,7 +86,7 @@ export const addRowToGrid = (currentGrid, level) => {
   for (let col = 0; col < config.cols; col++) {
     newRow.push({
       id: `${newRowIndex}-${col}`,
-      value: generateNumber(config.difficulty),
+      value: generateNumber(config.numberRange),
       matched: false,
       row: newRowIndex,
       col,

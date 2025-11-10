@@ -123,6 +123,17 @@ const GameScreen = ({ navigation }) => {
       return null;
     }
     
+    // Calculate tile size for 9x9 grid - responsive for all devices
+    const gridPadding = isTinyScreen ? 30 : isSmallScreen ? 35 : 40;
+    const gridMargin = isTinyScreen ? 20 : isSmallScreen ? 30 : 40;
+    const availableWidth = width - gridPadding - gridMargin;
+    const tileMargin = 4; // 2px margin on each side
+    const tileSize = Math.floor((availableWidth / 9) - tileMargin);
+    
+    // Ensure minimum tile size for readability
+    const minTileSize = 24;
+    const finalTileSize = Math.max(tileSize, minTileSize);
+    
     return grid.map((row, rowIndex) => (
       <View key={rowIndex} style={styles.row}>
         {row.map((tile) => (
@@ -130,6 +141,7 @@ const GameScreen = ({ navigation }) => {
             key={tile.id}
             tile={tile}
             animationTrigger={animationTrigger}
+            size={finalTileSize}
           />
         ))}
       </View>
@@ -227,38 +239,40 @@ const GameScreen = ({ navigation }) => {
         </ScrollView>
       </Animated.View>
 
-      {/* Add Row Button */}
-      <Animated.View 
-        style={[
-          styles.actionContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        <TouchableOpacity
+      {/* Add Row Button - Only show if level allows add rows */}
+      {levelConfig.addRowsAllowed > 0 && (
+        <Animated.View 
           style={[
-            styles.addRowButton,
-            !canAddRow && styles.disabledButton,
+            styles.actionContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
           ]}
-          onPress={handleAddRow}
-          disabled={!canAddRow}
-          activeOpacity={0.8}
         >
-          <Text style={[
-            styles.addRowButtonText,
-            !canAddRow && styles.disabledButtonText,
-          ]}>
-            {isTinyScreen 
-              ? `➕ (${levelConfig.addRowsAllowed - addRowsUsed})`
-              : isSmallScreen
-              ? `➕ Row (${levelConfig.addRowsAllowed - addRowsUsed})`
-              : `➕ Add Row (${levelConfig.addRowsAllowed - addRowsUsed})`
-            }
-          </Text>
-        </TouchableOpacity>
-      </Animated.View>
+          <TouchableOpacity
+            style={[
+              styles.addRowButton,
+              !canAddRow && styles.disabledButton,
+            ]}
+            onPress={handleAddRow}
+            disabled={!canAddRow}
+            activeOpacity={0.8}
+          >
+            <Text style={[
+              styles.addRowButtonText,
+              !canAddRow && styles.disabledButtonText,
+            ]}>
+              {isTinyScreen 
+                ? `➕ (${levelConfig.addRowsAllowed - addRowsUsed})`
+                : isSmallScreen
+                ? `➕ Row (${levelConfig.addRowsAllowed - addRowsUsed})`
+                : `➕ Add Row (${levelConfig.addRowsAllowed - addRowsUsed})`
+              }
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
 
       {/* Level Complete Modal */}
       <LevelCompleteModal
@@ -352,13 +366,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 10,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)',
     elevation: 8,
   },
   statItem: {
@@ -380,7 +388,7 @@ const styles = StyleSheet.create({
   },
   gridContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: isTinyScreen ? 10 : isSmallScreen ? 15 : 20,
   },
   gridContent: {
     paddingVertical: 20,
@@ -391,7 +399,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 20,
-    padding: 15,
+    padding: isTinyScreen ? 8 : isSmallScreen ? 12 : 15,
+    maxWidth: '100%',
   },
   row: {
     flexDirection: 'row',
@@ -412,10 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: isTinyScreen ? 16 : Math.max(width * 0.05, 20),
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0px 4px 8px rgba(255, 107, 107, 0.3)',
     elevation: 6,
     minHeight: isTinyScreen ? 40 : Math.max(width * 0.12, 48),
     maxWidth: width * 0.9,
@@ -425,7 +431,7 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: 'rgba(255,255,255,0.3)',
-    shadowOpacity: 0,
+    boxShadow: 'none',
     elevation: 0,
   },
   addRowButtonText: {

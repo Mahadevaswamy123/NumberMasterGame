@@ -9,9 +9,11 @@ import {
 import { useGame } from '../../contexts/GameContext';
 
 const { width } = Dimensions.get('window');
-const TILE_SIZE = Math.min((width - 80) / 4, 70); // Smaller, responsive tiles
 
-const Tile = ({ tile, animationTrigger }) => {
+const Tile = ({ tile, animationTrigger, size }) => {
+  // Use provided size or calculate default for 9x9 grid
+  // Ensure minimum size of 24px for readability
+  const TILE_SIZE = size || Math.max(Math.min((width - 80) / 9, 40), 24);
   const { gameState, actions } = useGame();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -117,13 +119,30 @@ const Tile = ({ tile, animationTrigger }) => {
   }, [isMatched]);
 
   const tileStyle = [
-    styles.tile,
+    {
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      backgroundColor: '#667eea',
+      borderRadius: Math.max(TILE_SIZE * 0.2, 8),
+      justifyContent: 'center',
+      alignItems: 'center',
+      margin: 2,
+      boxShadow: '0px 2px 4px rgba(102, 126, 234, 0.3)',
+      elevation: 4,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.2)',
+    },
     isSelected && styles.selectedTile,
     isMatched && styles.matchedTile,
   ];
 
   const textStyle = [
-    styles.tileText,
+    {
+      fontSize: Math.max(Math.min(TILE_SIZE * 0.5, 18), 10), // Min 10px, max 18px
+      fontWeight: 'bold',
+      color: '#FFFFFF',
+      textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+    },
     isSelected && styles.selectedText,
     isMatched && styles.matchedText,
   ];
@@ -153,58 +172,25 @@ const Tile = ({ tile, animationTrigger }) => {
 };
 
 const styles = StyleSheet.create({
-  tile: {
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    backgroundColor: '#667eea',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 6,
-    shadowColor: '#667eea',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
   selectedTile: {
     backgroundColor: '#FF6B6B',
     borderColor: '#FF4757',
-    borderWidth: 3,
-    shadowColor: '#FF6B6B',
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 12,
+    borderWidth: 2,
+    boxShadow: '0px 0px 8px rgba(255, 107, 107, 0.5)',
+    elevation: 8,
   },
   matchedTile: {
     backgroundColor: '#4ECDC4',
     borderColor: '#26D0CE',
-    borderWidth: 3,
-    shadowColor: '#4ECDC4',
-    shadowOpacity: 0.6,
-    shadowRadius: 15,
-    elevation: 15,
-  },
-  tileText: {
-    fontSize: Math.min(TILE_SIZE * 0.4, 20),
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    borderWidth: 2,
+    boxShadow: '0px 0px 10px rgba(78, 205, 196, 0.6)',
+    elevation: 10,
   },
   selectedText: {
     color: '#FFFFFF',
-    fontSize: Math.min(TILE_SIZE * 0.45, 22),
   },
   matchedText: {
     color: '#FFFFFF',
-    fontSize: Math.min(TILE_SIZE * 0.4, 20),
   },
 });
 

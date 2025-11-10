@@ -2,21 +2,41 @@
 
 A React Native Expo puzzle game similar to "Number Master" by KiwiFun, featuring custom matching rules and progressive difficulty levels.
 
+## ✨ Latest Update - v2.0
+
+### What's New
+- ✅ **9×9 Grid**: All levels now use a 9×9 grid (81 tiles)
+- ✅ **Progressive Difficulty**: 5 levels with gradual difficulty increase
+- ✅ **Level 1 Optimized**: No add rows for quick learning
+- ✅ **Responsive Design**: Works perfectly on all devices (phone, tablet, web)
+- ✅ **Dynamic Tile Sizing**: Automatically adjusts to screen size
+
 ## 🎮 Game Features
 
 ### Core Gameplay
-- **Grid-based puzzle**: Start with a 4×3 grid of number tiles
+- **Grid-based puzzle**: 9×9 grid of number tiles (81 cells)
 - **Matching Rules**: 
   - Numbers are equal (e.g., 5 = 5)
   - Numbers sum to 10 (e.g., 3 + 7 = 10)
-- **Timer**: 2 minutes per level
-- **Add Row Feature**: Limited strategic additions per level
+- **Timer**: Variable time per level (120-180 seconds)
+- **Add Row Feature**: Strategic additions (0-2 per level)
 - **Visual Feedback**: Smooth animations for matches and invalid attempts
 
-### 3 Difficulty Levels
-1. **Level 1 (Easy)**: 2 add-rows allowed, easier number combinations
-2. **Level 2 (Medium)**: 1 add-row allowed, more challenging combinations  
-3. **Level 3 (Hard)**: 1 add-row allowed, complex number patterns
+### 5 Progressive Difficulty Levels
+
+| Level | Grid | Add Rows | Matches | Time | Difficulty |
+|-------|------|----------|---------|------|------------|
+| 1     | 9×9  | 0        | 8       | 180s | Easy       |
+| 2     | 9×9  | 1        | 12      | 150s | Easy       |
+| 3     | 9×9  | 1        | 15      | 140s | Medium     |
+| 4     | 9×9  | 2        | 18      | 130s | Medium     |
+| 5     | 9×9  | 2        | 20      | 120s | Hard       |
+
+**Level 1 Features**:
+- No "Add Row" button (0 add rows allowed)
+- Quick completion (3 minutes)
+- Perfect for learning the game
+- Numbers 1-9 only
 
 ## 🚀 Getting Started
 
@@ -106,18 +126,57 @@ NumberMasterGame/
 - Score calculation based on matches, time, and level
 - Animation system for visual feedback
 
+## 🎨 Reusable Level System Framework
+
+This game uses a **universal level system** that can be imported into ANY game!
+
+### Key Features
+- ✅ **Design Patterns**: Strategy, Factory, Observer, Singleton
+- ✅ **OOP Principles**: SOLID, Encapsulation, Polymorphism
+- ✅ **Game-Agnostic**: Works with grid-based, XP-based, time-based games
+- ✅ **Extensible**: Easy to create custom level strategies
+- ✅ **Event-Driven**: Observer pattern for level events
+
+### Location
+```
+core/LevelSystem/
+├── LevelStrategy.js          # Strategy pattern implementations
+├── LevelManager.js            # Facade pattern manager
+├── NumberMasterLevelSystem.js # Number Master specific
+├── index.js                   # Main exports
+└── README.md                  # Full documentation
+```
+
+### Usage in Other Games
+```javascript
+// For RPG games
+import { LevelFactory } from './core/LevelSystem';
+const levelManager = LevelFactory.createXPLevelManager({ baseXP: 100 });
+
+// For racing games
+const levelManager = LevelFactory.createTimeLevelManager(levels);
+
+// Custom implementation
+class MyStrategy extends LevelStrategy { ... }
+const levelManager = new LevelManager(new MyStrategy());
+```
+
+See `core/LevelSystem/README.md` for complete documentation.
+
 ## 🎨 Customization
 
 ### Adding New Levels
-Edit `LEVEL_CONFIG` in `utils/gameEngine.js`:
+The level system automatically generates levels beyond level 5. To customize:
 ```javascript
-4: {
-  rows: 4,
-  cols: 4,
-  addRowsAllowed: 0,
-  timeLimit: 90,
-  difficulty: 'expert',
-  targetMatches: 15,
+// In core/LevelSystem/NumberMasterLevelSystem.js
+generateDynamicLevel(level) {
+  return {
+    level,
+    rows: 9,
+    cols: 9,
+    addRowsAllowed: Math.min(2 + Math.floor((level - 5) / 3), 5),
+    // ... customize other properties
+  };
 }
 ```
 
@@ -125,20 +184,21 @@ Edit `LEVEL_CONFIG` in `utils/gameEngine.js`:
 Update `checkMatch()` function in `gameEngine.js` to add new matching criteria.
 
 ### Styling
-Component styles are defined in each file using StyleSheet. Colors and animations can be customized in the respective component files.
+Component styles use modern CSS properties (`boxShadow`, `textShadow`) for cross-platform compatibility.
 
 ## 🧪 Testing
 
-Run the game engine test:
+Run the game test:
 ```bash
-node test-game.js
+node test-game-simple.js
 ```
 
 This verifies:
-- Level configuration
-- Grid generation
-- Match checking logic
-- Available matches calculation
+- ✅ 9×9 grid for all levels
+- ✅ Level 1 has 0 add rows
+- ✅ Progressive difficulty working
+- ✅ All configurations valid
+- ✅ Feasible target matches
 
 ## 📱 Deployment
 
@@ -153,15 +213,28 @@ This verifies:
 
 ## 🎉 Features Implemented
 
+### Game Features
 ✅ Complete game engine with match validation  
-✅ 3 progressive difficulty levels  
+✅ 5 progressive difficulty levels (9×9 grid)  
 ✅ Smooth tile animations and feedback  
 ✅ Timer with visual warnings  
-✅ Strategic "Add Row" feature  
+✅ Strategic "Add Row" feature (conditional)  
 ✅ Score tracking and level progression  
-✅ Responsive design for mobile devices  
+✅ **Fully responsive design** (phone, tablet, web, iOS, Android)  
+✅ **Dynamic tile sizing** for all screen sizes  
 ✅ Clean, modern UI with visual feedback  
+✅ Level 1 optimized for quick learning (no add rows)  
+✅ Modern CSS (boxShadow, textShadow - no deprecation warnings)  
 ✅ Ready for APK build and deployment  
+
+### Architecture & Code Quality
+✅ **Reusable Level System Framework** (can be used in ANY game)  
+✅ **Design Patterns**: Strategy, Factory, Observer, Singleton  
+✅ **OOP Principles**: SOLID, Encapsulation, Polymorphism  
+✅ **Decoupled Architecture**: Level system separate from game logic  
+✅ **Reusable UI Components**: Button, Card, StatDisplay  
+✅ **Professional Code Quality**: Clean, maintainable, extensible  
+✅ **Well-Documented**: Comprehensive README files  
 
 ## 🔧 Troubleshooting
 
