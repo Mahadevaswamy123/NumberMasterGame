@@ -8,17 +8,19 @@ const Timer = () => {
   const colorAnim = useRef(new Animated.Value(0)).current;
 
   const { timeRemaining } = gameState;
-  const minutes = Math.floor(timeRemaining / 60);
-  const seconds = timeRemaining % 60;
+  // Ensure timeRemaining is always an integer
+  const timeInt = Math.floor(timeRemaining);
+  const minutes = Math.floor(timeInt / 60);
+  const seconds = timeInt % 60;
 
-  // Format time display
+  // Format time display (ensure integers)
   const formatTime = (mins, secs) => {
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${Math.floor(mins).toString().padStart(2, '0')}:${Math.floor(secs).toString().padStart(2, '0')}`;
   };
 
   // Pulse animation when time is running low
   useEffect(() => {
-    if (timeRemaining <= 30 && timeRemaining > 0) {
+    if (timeInt <= 30 && timeInt > 0) {
       const pulseAnimation = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
@@ -39,14 +41,14 @@ const Timer = () => {
     } else {
       pulseAnim.setValue(1);
     }
-  }, [timeRemaining]);
+  }, [timeInt]);
 
   // Color animation based on time remaining
   useEffect(() => {
     let targetValue = 0;
-    if (timeRemaining <= 10) {
+    if (timeInt <= 10) {
       targetValue = 1; // Red
-    } else if (timeRemaining <= 30) {
+    } else if (timeInt <= 30) {
       targetValue = 0.5; // Orange
     } else {
       targetValue = 0; // Green
@@ -57,7 +59,7 @@ const Timer = () => {
       duration: 500,
       useNativeDriver: false,
     }).start();
-  }, [timeRemaining]);
+  }, [timeInt]);
 
   // Interpolate color based on time
   const backgroundColor = colorAnim.interpolate({
@@ -65,7 +67,7 @@ const Timer = () => {
     outputRange: ['#4CAF50', '#FF9800', '#F44336'], // Green -> Orange -> Red
   });
 
-  const textColor = timeRemaining <= 30 ? '#FFFFFF' : '#2C3E50';
+  const textColor = timeInt <= 30 ? '#FFFFFF' : '#2C3E50';
 
   return (
     <View style={styles.container}>
@@ -98,13 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     minWidth: 140,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)',
     elevation: 8,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.3)',
